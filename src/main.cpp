@@ -37,8 +37,8 @@ code	color
 #include <SPI.h>
 #include <ArduinoOTA.h>
 
-const char *ssid         = "MeshCasa";
-const char *password     = "felipeepamela1101";
+const char *ssid         = "IOT";
+const char *password     = "ac1ce0ss6#iot";
 #define TFT_GREY 0x5AEB
 long rssi = 0; 
 int bars = 0;
@@ -54,6 +54,7 @@ void setup(void) {
 
   tft.setTextSize(1);
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.drawCentreString("Iniciando..",120,40,2);
   WiFi.begin ( ssid, password );
 
   // Wait for connection
@@ -108,7 +109,10 @@ void loop() {
     tft.fillRect(100 + (b*5),20 - (b*2),3,b*2,TFT_WHITE);
   }
   
-  delay(100);
-  tft.fillScreen(TFT_BLACK);
+  delay(300);
+  for (int b=0; b <= bars; b++){
+    tft.fillRect(100+(b*5),20-(b*2),3,b*2,TFT_BLACK);
+  }
+  //tft.fillScreen(TFT_BLACK);
 }
 
