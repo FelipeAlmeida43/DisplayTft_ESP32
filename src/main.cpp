@@ -36,9 +36,12 @@ code	color
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
 #include <ArduinoOTA.h>
-
+/*
 const char *ssid         = "IOT";
 const char *password     = "ac1ce0ss6#iot";
+*/
+const char *ssid         = "MeshCasa";
+const char *password     = "felipeepamela1101";
 #define TFT_GREY 0x5AEB
 long rssi = 0; 
 int bars = 0;
@@ -54,12 +57,13 @@ void setup(void) {
 
   tft.setTextSize(1);
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-  tft.drawCentreString("Iniciando..",120,40,2);
+  tft.drawCentreString("Iniciando",120,40,2);
   WiFi.begin ( ssid, password );
 
   // Wait for connection
   while ( WiFi.status() != WL_CONNECTED ) {
-    delay ( 10 );
+    for(int i=0;i<5;i++)tft.drawChar('.',129+i,40);
+    delay ( 250 );
   }
   tft.drawRoundRect(0,0,240,240,10,TFT_WHITE);
   tft.drawCentreString("Wifi Conectado",120,40,2);
@@ -81,38 +85,69 @@ void setup(void) {
   }*/
   // Do some simple loop math to draw rectangles as the bars
 // Draw one bar for each "bar" Duh...
+ArduinoOTA.onStart([]() {
+    Serial.println("Inicio...");
+  });
+  
+  
+  
+  ArduinoOTA.onEnd([]() {
+    Serial.println("nFim!");
+  });
+
+    
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progresso: %u%%r", (progress / (total / 100)));
+  });
+
+  
+  
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Erro [%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Autenticacao Falhou");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Falha no Inicio");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Falha na Conexao");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Falha na Recepcao");
+    else if (error == OTA_END_ERROR) Serial.println("Falha no Fim");
+  });
+
+  
+   ArduinoOTA.begin();
   
 }
 
 void loop() {
-  
+  ArduinoOTA.handle();
     tft.drawCentreString("Maquina 1 Manutencao",120,80,2);
   //  int bars = map(RSSI,-80,-44,1,6); // this method doesn't refelct the Bars well
   // simple if then to set the number of bars
   rssi  = WiFi.RSSI();
-  if (rssi > -55) { 
+  //tft.drawCentreString("RSSI:"+rssi,120,20,2);
+  if (rssi > -55) {
     bars = 5;
-  } else if (rssi < -55 & rssi > -65) {
+  } else if ( (rssi < -55) && (rssi > -65)) {
     bars = 4;
-  } else if (rssi < -65 & rssi > -70) {
+  } else if ( (rssi < -65) && (rssi > -70)) {
     bars = 3;
-  } else if (rssi < -70 & rssi > -78) {
+  } else if ((rssi < -70 ) && (rssi > -78)) {
     bars = 2;
-  } else if (rssi < -78 & rssi > -82) {
+  } else if ( (rssi < -78) && (rssi > -82)) {
     bars = 1;
   } else {
-    bars = 0;
+    bars = 1;
   }
   
   for (int b=0; b <= bars; b++) {
     //display.fillRect(59 + (b*5),33 - (b*5),3,b*5,WHITE); 
-    tft.fillRect(100 + (b*5),20 - (b*2),3,b*2,TFT_WHITE);
+    tft.fillRect(100 + (b*5),20 - (b*2),3,b*2,TFT_DARKGREEN);
   }
   
   delay(300);
   for (int b=0; b <= bars; b++){
-    tft.fillRect(100+(b*5),20-(b*2),3,b*2,TFT_BLACK);
+    tft.fillRect(100+(b*5),20-(b*2),3,b*2,TFT_WHITE);
+    tft.fillRect(120,20,10,10,TFT_BLACK);
   }
   //tft.fillScreen(TFT_BLACK);
+  
 }
 
